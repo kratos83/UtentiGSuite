@@ -62,13 +62,13 @@
        <widget class="QPushButton" name="pushButtonAlunno">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>141</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>110</width>
+          <width>141</width>
           <height>16777215</height>
          </size>
         </property>
@@ -153,13 +153,13 @@
        <widget class="QPushButton" name="pushButton_3">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>141</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>110</width>
+          <width>141</width>
           <height>16777215</height>
          </size>
         </property>
@@ -303,7 +303,7 @@
      <x>0</x>
      <y>0</y>
      <width>693</width>
-     <height>21</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
