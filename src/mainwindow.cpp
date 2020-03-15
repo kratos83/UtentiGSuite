@@ -145,139 +145,152 @@ void MainWindow::insertAlunni()
 
 void MainWindow::eliminaAlunni()
 {
-    QSqlQuery query;
-    query.prepare("delete from utenti");
-    query.exec();
-    lista();
+    if(model->rowCount() == 0)
+        QMessageBox::warning(this,"Utenti","Non esiste nessun utente nella lista");
+    else{
+        QSqlQuery query;
+        query.prepare("delete from utenti");
+        query.exec();
+        lista();
+    }
 }
 
 void MainWindow::esportaCSV()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Esporta CSV",
-                                                    "*.csv","CSV(*.csv);;Tutti i file(*.*)");
+    if(model->rowCount() == 0)
+        QMessageBox::warning(this,"Utenti","Non esiste nessun utente inserito");
+    else{
+        QString fileName = QFileDialog::getSaveFileName(this, "Esporta CSV",
+                                                        "*.csv","CSV(*.csv);;Tutti i file(*.*)");
 
-    if (fileName.length() != 0) {
-            // Aggiunge estensione alla fine del file se non c'è
-            if (fileName.indexOf(".csv") < 0) {
-                fileName += ".csv";
+        if (fileName.length() != 0) {
+                // Aggiunge estensione alla fine del file se non c'è
+                if (fileName.indexOf(".csv") < 0) {
+                    fileName += ".csv";
+                }
             }
+
+        while( model->canFetchMore(QModelIndex()))
+            model->fetchMore(QModelIndex());
+        int x = 0;
+        QString exportdata;
+
+        int counthidden=0, jint = 0;
+
+        while (jint < model->columnCount()) {
+
+        counthidden+=ui->tableView->isColumnHidden(jint);
+        jint++;
         }
 
-    int x = 0;
-    QString exportdata;
 
-    int counthidden=0, jint = 0;
+        int w = 1;
+        while (x < model->columnCount()){
 
-    while (jint < model->columnCount()) {
+        if (!ui->tableView->isColumnHidden(x)) {
 
-    counthidden+=ui->tableView->isColumnHidden(jint);
-    jint++;
+
+        exportdata.append(model->headerData(x,Qt::Horizontal,Qt::DisplayRole).toString());
+
+
+        if (model->columnCount() - w > counthidden)
+        exportdata.append(",");
+        else {
+        exportdata.append("\n");
+
+        }
+        w++;
+        }
+        x++;
+
+        }
+
+        int z = 0;
+
+        w = 1;
+        while (z < model->rowCount()) {
+
+        x = 0;
+
+        w = 1;
+        while (x < model->columnCount()) {
+        if (!ui->tableView->isColumnHidden(x)) {
+
+
+        exportdata.append(model->data(model->index(z,x),Qt::DisplayRole).toString());
+
+        if (model->columnCount() - w > counthidden)
+        exportdata.append(",");
+        else
+        exportdata.append("\n");
+
+        w++;
+        }
+        x++;
+
+        }
+
+        z++;
+        }
+
+        QFile file;
+        if (!fileName.isEmpty()) {
+        file.setFileName(fileName);
+                if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+                    return;
+        }
+        QByteArray ttext;
+        ttext.append(exportdata);
+        file.write(ttext);
     }
-
-
-    int w = 1;
-    while (x < model->columnCount()){
-
-    if (!ui->tableView->isColumnHidden(x)) {
-
-
-    exportdata.append(model->headerData(x,Qt::Horizontal,Qt::DisplayRole).toString());
-
-
-    if (model->columnCount() - w > counthidden)
-    exportdata.append(",");
-    else {
-    exportdata.append("\n");
-
-    }
-    w++;
-    }
-    x++;
-
-    }
-
-    int z = 0;
-
-    w = 1;
-    while (z < model->rowCount()) {
-
-    x = 0;
-
-    w = 1;
-    while (x < model->columnCount()) {
-    if (!ui->tableView->isColumnHidden(x)) {
-
-
-    exportdata.append(model->data(model->index(z,x),Qt::DisplayRole).toString());
-
-    if (model->columnCount() - w > counthidden)
-    exportdata.append(",");
-    else
-    exportdata.append("\n");
-
-    w++;
-    }
-    x++;
-
-    }
-
-    z++;
-    }
-
-    QFile file;
-    if (!fileName.isEmpty()) {
-     file.setFileName(fileName);
-            if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-                return;
-    }
-    QByteArray ttext;
-    ttext.append(exportdata);
-    file.write(ttext);
 }
 
 void MainWindow::esportaExcel()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, QObject::tr("Esporta Excel"),
-                                                            "*.xlsx", QObject::tr("XLSX(*.xlsx);;Tutti i file(*.*)"));
+    if(model->rowCount() == 0)
+        QMessageBox::warning(this,"Utenti","Non esiste nessun utente inserito");
+    else{
+        QString fileName = QFileDialog::getSaveFileName(this, QObject::tr("Esporta Excel"),
+                                                                "*.xlsx", QObject::tr("XLSX(*.xlsx);;Tutti i file(*.*)"));
 
 
-            if (fileName.length() != 0) {
-                // Aggiunge estensione alla fine del file se non c'è
-                if (fileName.indexOf(".xlsx") < 0) {
-                    fileName += ".xlsx";
-                }
-            }
-
-            Document excel;
-            while( model->canFetchMore(QModelIndex()))
-                model->fetchMore(QModelIndex());
-                
-                for(int i= 0; i < model->columnCount(QModelIndex());++i){
-                    //Imposto header label per la descrizione
-                    Format fm;
-                    fm.setFontName("Verdana");
-                    fm.setFontBold(true);
-                    fm.setFontSize(12);
-                    excel.setRowHeight(1,30.0);
-                    excel.setRowHeight(2,30.0);
-                    excel.setColumnWidth(i,25.0);
-                    excel.write(1,7,"Elenco alunni",fm);
-                    excel.write(2,1+i,model->headerData(i,Qt::Horizontal,Qt::DisplayRole).toString(),fm);
-                    for(int row = 0; row < model->rowCount(QModelIndex()); row++){
-                    //Imposto le righe
-                    Format fmt;
-                    fmt.setFontName("Verdana");
-                    fmt.setFontSize(12);
-                    excel.setRowHeight(3,30.0);
-                    
-                    excel.write(3+row,1+i,model->data(model->index(row,i,QModelIndex()),Qt::DisplayRole).toString(),fmt);
+                if (fileName.length() != 0) {
+                    // Aggiunge estensione alla fine del file se non c'è
+                    if (fileName.indexOf(".xlsx") < 0) {
+                        fileName += ".xlsx";
                     }
                 }
 
-                int ris = excel.saveAs(fileName);
-                if(ris != 0)
-                    QMessageBox::information(this,"PrimaNotaCassa","File salvato correttamente");
+                Document excel;
+                while( model->canFetchMore(QModelIndex()))
+                    model->fetchMore(QModelIndex());
+                    
+                    for(int i= 0; i < model->columnCount(QModelIndex());++i){
+                        //Imposto header label per la descrizione
+                        Format fm;
+                        fm.setFontName("Verdana");
+                        fm.setFontBold(true);
+                        fm.setFontSize(12);
+                        excel.setRowHeight(1,30.0);
+                        excel.setRowHeight(2,30.0);
+                        excel.setColumnWidth(i,25.0);
+                        excel.write(1,7,"Elenco alunni",fm);
+                        excel.write(2,1+i,model->headerData(i,Qt::Horizontal,Qt::DisplayRole).toString(),fm);
+                        for(int row = 0; row < model->rowCount(QModelIndex()); row++){
+                        //Imposto le righe
+                        Format fmt;
+                        fmt.setFontName("Verdana");
+                        fmt.setFontSize(12);
+                        excel.setRowHeight(3,30.0);
+                        
+                        excel.write(3+row,1+i,model->data(model->index(row,i,QModelIndex()),Qt::DisplayRole).toString(),fmt);
+                        }
+                    }
 
+                    int ris = excel.saveAs(fileName);
+                    if(ris != 0)
+                        QMessageBox::information(this,"Utenti","File salvato correttamente");
+    }
 }
 
 void MainWindow::informazioni()

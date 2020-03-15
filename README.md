@@ -1,3 +1,5 @@
+[![Overall downloads on Github](https://img.shields.io/github/downloads/kratos83/UtentiGSuite/total.svg?maxAge=3600)](https://github.com/kratos83/UtentiGSuite/releases)
+
 # UtentiGSuite
 Programma per la creazione di utenti per la Google Suite
 
