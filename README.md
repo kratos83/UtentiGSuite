@@ -1,3 +1,4 @@
+[![Latest stable release](https://img.shields.io/github/release/UtentiGSuite/UtentiGSuite.svg?maxAge=3600)](https://github.com/kratos83/UtentiGSuite/releases)
 [![Overall downloads on Github](https://img.shields.io/github/downloads/kratos83/UtentiGSuite/total.svg?maxAge=3600)](https://github.com/kratos83/UtentiGSuite/releases)
 [![license](https://img.shields.io/badge/license-GPLv2-green.svg)](LICENSE)
 
