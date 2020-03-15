@@ -132,7 +132,11 @@ QColor XlsxColor::fromARGBString(const QString &c)
 QString XlsxColor::toARGBString(const QColor &c)
 {
     QString color;
+#if QT_VERSION_CHECK(5,14,0)
+    color.asprintf("%02X%02X%02X%02X", c.alpha(), c.red(), c.green(), c.blue());
+#elif
     color.sprintf("%02X%02X%02X%02X", c.alpha(), c.red(), c.green(), c.blue());
+#endif
     return color;
 }
 
