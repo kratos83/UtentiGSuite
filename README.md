@@ -1,7 +1,7 @@
 [![Overall downloads on Github](https://img.shields.io/github/downloads/kratos83/UtentiGSuite/total.svg?maxAge=3600)](https://github.com/kratos83/UtentiGSuite/releases)
 [![license](https://img.shields.io/badge/license-GPLv3-green.svg)](LICENSE)
 
-# UtentiGSuite
+# UtentiGSuite 0.3
 Programma per la creazione di utenti per la Google Suite
 
 ------------------------------------------------------------------------
@@ -9,7 +9,7 @@ Programma per la creazione di utenti per la Google Suite
 
 ------------------------------------------------------------------------
 
-È presente un video dimostrativo per l'utilizzo, inoltre è possibile inserire gli alunni a uno a uno 
+È presente un video dimostrativo per l'utilizzo, inoltre è possibile inserire gli utenti a uno a uno 
 e il programma crea automaticamente la mail e la password. La password viene creata secondo un criterio
 ben definito, cioè sono 12 caratteri alfanumerici compresi quelli speciali.
 

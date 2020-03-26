@@ -24,6 +24,7 @@ private slots:
     void esportaExcel();
     void insertAlunni();
     void informazioni();
+    void editLineFinishedGruppo();
 
 private:
     Ui::MainWindow *ui;

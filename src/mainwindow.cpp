@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "../xlsx/xlsxdocument.h"
 #include "../xlsx/xlsxformat.h"
-
 using namespace QXlsx;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -10,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowTitle("Inserisci alunni");
+    setWindowTitle("Inserimento utenti");
     model = new QSqlQueryModel(this);
     connect(ui->pushButtonRemove,&QPushButton::clicked,this,&MainWindow::eliminaAlunni);
     connect(ui->actionEsci,&QAction::triggered,qApp,&QApplication::quit);
@@ -18,7 +17,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButtonExcel,&QPushButton::clicked,this,&MainWindow::esportaExcel);
     connect(ui->pushButtonAlunno,&QPushButton::clicked,this,&MainWindow::insertAlunni);
     connect(ui->actionAbout,&QAction::triggered,this,&MainWindow::informazioni);
+    connect(ui->lineEditGruppo,&QLineEdit::editingFinished,this,&MainWindow::editLineFinishedGruppo);
     lista();
+}
+
+void MainWindow::editLineFinishedGruppo()
+{
+    if(!ui->lineEditGruppo->text().contains("/"))
+        ui->lineEditGruppo->setText("/"+ui->lineEditGruppo->text());
+    else
+        ui->lineEditGruppo->setText(ui->lineEditGruppo->text());
 }
 
 void MainWindow::lista()
@@ -49,70 +57,95 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    if(ui->lineEditDominio->text() == "" || ui->lineEditGruppo->text() == "")
+    if(ui->lineEditGruppo->text().contains("/"))
+        return;
+    else ui->lineEditGruppo->setText("/");
+    if(ui->lineEditDominio->text() == "")
     {
         QMessageBox::warning(this,"Utenti","Attenzione, il dominio o il gruppo non sono stati inseriti");
     }
     else{
-        QString fileName = QFileDialog::getOpenFileName(this, QObject::tr("Apri file xlsx"),
-                                                                    "*.xlsx", QObject::tr("File XLSX(*.xlsx);;Tutti i file(*.*)"));
+        QMessageBox *box= new QMessageBox(this);
+        box->setWindowTitle("Utenti");
+        box->setText("Il file excel\ndeve essere composto\n");
+        box->setInformativeText("dalle sole colonne Nome e Cognome");
+        box->setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        box->setDefaultButton(QMessageBox::Ok);
+        int ret = box->exec();
+        switch(ret) {
+        case QMessageBox::Ok:{
+            QString fileName = QFileDialog::getOpenFileName(this, QObject::tr("Apri file xlsx"),
+                                                                        "*.xlsx", QObject::tr("File XLSX(*.xlsx);;Tutti i file(*.*)"));
 
-        if (fileName.isEmpty())
-        return;
-        else {
-        QFile file(fileName);
+            if (fileName.isEmpty())
+            return;
+            else {
+            QFile file(fileName);
 
-        if (!file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(this, tr("Unable to open file"),
-                    file.errorString());
-                    return;
-        }
-        Document xlsx(fileName);
-        for(int i=1; i <= xlsx.dimension().rowCount(); i++)
-        {
-            QProgressDialog progressDialog(this);
-            progressDialog.setRange(0, xlsx.dimension().rowCount());
-            progressDialog.setWindowModality(Qt::WindowModal);
-            progressDialog.setWindowTitle(tr("Inserimento alunni"));
-            progressDialog.setValue(i);
-            progressDialog.setLabelText(tr("Inserimento alunni %1 di %2...")
-                                            .arg(i).arg(xlsx.dimension().rowCount()));
-            qApp->processEvents();
-            char pwd[]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
-                        'O','P','Q','R','S','T','U','V','W','X','Y','Z',
-                        'a','b','c','d','e','f','g','h','i','j','k','l','m','n',
-                        'o','p','q','r','s','t','u','v','w','x','y','z',
-                    '0','1','2','3','4','5','6','7','8','9','@','?','!',';'};
+            if (!file.open(QIODevice::ReadOnly)) {
+                QMessageBox::information(this, tr("Unable to open file"),
+                        file.errorString());
+                        return;
+            }
+            Document xlsx(fileName);
+            if(xlsx.dimension().columnCount() > 2)
+            {
+                QMessageBox::warning(this,"Utenti","Il file contiene più di 2 colonne");
+            }
+            else{
+                for(int i=1; i <= xlsx.dimension().rowCount(); i++)
+                {
+                    QProgressDialog progressDialog(this);
+                    progressDialog.setRange(0, xlsx.dimension().rowCount());
+                    progressDialog.setWindowModality(Qt::WindowModal);
+                    progressDialog.setWindowTitle(tr("Inserimento alunni"));
+                    progressDialog.setValue(i);
+                    progressDialog.setLabelText(tr("Inserimento alunni %1 di %2...")
+                                                    .arg(i).arg(xlsx.dimension().rowCount()));
+                    qApp->processEvents();
+                    char pwd[]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
+                                'O','P','Q','R','S','T','U','V','W','X','Y','Z',
+                                'a','b','c','d','e','f','g','h','i','j','k','l','m','n',
+                                'o','p','q','r','s','t','u','v','w','x','y','z',
+                            '0','1','2','3','4','5','6','7','8','9','@','?','!',';'};
 
-            QString addChar;
-            for(int z=0;z<12;z++) {
-                addChar+= QString(pwd[rand()%66]);
+                    QString addChar;
+                    for(int z=0;z<12;z++) {
+                        addChar+= QString(pwd[rand()%66]);
+                    }
+                    QSqlQuery query;
+                    QString name_surname;
+                    QString req = "INSERT INTO utenti VALUES('";
+                    if(Cell *name = xlsx.cellAt(i,1)){
+                    req.append(QString(name->value().toString().toStdString().c_str()).replace("'","''"));
+                    name_surname = QString(name->value().toString().toStdString().c_str()).replace("'","''");
+                    req.append("','");
+                    }
+                    if(Cell *lastname = xlsx.cellAt(i,2)){
+                    req.append(QString(lastname->value().toString().toStdString().c_str()).replace("'","''"));
+                    name_surname += QString("."+QString(lastname->value().toString().toStdString().c_str()).replace("'","''"));
+                    req.append("',");
+                    }
+                    req.append("'"+QString(name_surname.remove(" ").remove("'").replace("ì","i").replace("à","a").replace("ò","o").toLower()+"@"+ui->lineEditDominio->text().replace("'","''"))+"',"
+                    "'"+addChar+"','"+ui->lineEditGruppo->text().replace("'","''")+"'");
+                    req.append(");");
+                    query.prepare(req);
+                    progressDialog.show();
+                    progressDialog.update();
+                    
+                    query.prepare(req);
+                    query.exec();
+                }
             }
-            QSqlQuery query;
-            QString name_surname;
-            QString req = "INSERT INTO utenti VALUES('";
-            if(Cell *name = xlsx.cellAt(i,1)){
-            req.append(QString(name->value().toString().toStdString().c_str()).replace("'","''"));
-            name_surname = QString(name->value().toString().toStdString().c_str()).replace("'","''");
-            req.append("','");
             }
-            if(Cell *lastname = xlsx.cellAt(i,2)){
-            req.append(QString(lastname->value().toString().toStdString().c_str()).replace("'","''"));
-            name_surname += QString("."+QString(lastname->value().toString().toStdString().c_str()).replace("'","''"));
-            req.append("',");
+            lista();
+            break;
             }
-            req.append("'"+QString(name_surname.remove(" ").remove("'").replace("ì","i").replace("à","a").replace("ò","o").toLower()+"@"+ui->lineEditDominio->text().replace("'","''"))+"',"
-            "'"+addChar+"','/"+ui->lineEditGruppo->text().replace("'","''")+"'");
-            req.append(");");
-            query.prepare(req);
-            progressDialog.show();
-            progressDialog.update();
-            
-            query.prepare(req);
-            query.exec();
-        }
-        }
-        lista();
+        case QMessageBox::Cancel:
+        //Close
+        box->close();
+        break;
+    }
     }
 }
 

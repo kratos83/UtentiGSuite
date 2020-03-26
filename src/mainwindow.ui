@@ -73,7 +73,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Inserisci alunno</string>
+         <string>Inserisci utente</string>
         </property>
         <property name="icon">
          <iconset resource="images.qrc">
@@ -185,7 +185,7 @@
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Lista alunni</string>
+         <string>Lista utenti</string>
         </property>
        </widget>
       </item>
@@ -212,7 +212,7 @@
       <item>
        <widget class="QPushButton" name="pushButtonRemove">
         <property name="text">
-         <string>Elimina alunni</string>
+         <string>Elimina utenti</string>
         </property>
         <property name="icon">
          <iconset resource="images.qrc">
