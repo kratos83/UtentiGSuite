@@ -12,12 +12,12 @@ ENDIF()
     
 IF(WIN32)
 set(Qt5Gui_PRIVATE_INCLUDE_DIRS
-        "${MINGW_PREFIX}/include/qt/QtGui/5.14.1"
-        "${MINGW_PREFIX}/include/qt/QtGui/5.14.1/QtGui"
+        "${MINGW_PREFIX}/include/qt/QtGui/5.14.2"
+        "${MINGW_PREFIX}/include/qt/QtGui/5.14.2/QtGui"
     )
 set(Qt5Core_PRIVATE_INCLUDE_DIRS
-        "${MINGW_PREFIX}/include/qt/QtCore/5.14.1"
-        "${MINGW_PREFIX}/include/qt/QtCore/5.14.1/QtCore"
+        "${MINGW_PREFIX}/include/qt/QtCore/5.14.2"
+        "${MINGW_PREFIX}/include/qt/QtCore/5.14.2/QtCore"
     )
 include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} 
 		    ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_PRIVATE_INCLUDE_DIRS} ${Qt5Core_PRIVATE_INCLUDE_DIRS})
