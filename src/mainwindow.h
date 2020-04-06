@@ -25,6 +25,7 @@ private slots:
     void insertAlunni();
     void informazioni();
     void editLineFinishedGruppo();
+    void enableCheckBox(bool ok);
 
 private:
     Ui::MainWindow *ui;

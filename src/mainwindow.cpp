@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButtonAlunno,&QPushButton::clicked,this,&MainWindow::insertAlunni);
     connect(ui->actionAbout,&QAction::triggered,this,&MainWindow::informazioni);
     connect(ui->lineEditGruppo,&QLineEdit::editingFinished,this,&MainWindow::editLineFinishedGruppo);
+    connect(ui->checkBox,&QCheckBox::clicked,this,&MainWindow::enableCheckBox);
+    ui->lineEditPasswordManuale->setEnabled(false);
     lista();
 }
 
@@ -55,11 +57,13 @@ void MainWindow::on_pushButton_2_clicked()
     qApp->quit();
 }
 
+void MainWindow::enableCheckBox(bool ok)
+{
+    ui->lineEditPasswordManuale->setEnabled(ok);
+}
+
 void MainWindow::on_pushButton_3_clicked()
 {
-    if(ui->lineEditGruppo->text().contains("/"))
-        return;
-    else ui->lineEditGruppo->setText("/");
     if(ui->lineEditDominio->text() == "")
     {
         QMessageBox::warning(this,"Utenti","Attenzione, il dominio o il gruppo non sono stati inseriti");
@@ -110,8 +114,12 @@ void MainWindow::on_pushButton_3_clicked()
                             '0','1','2','3','4','5','6','7','8','9','@','?','!',';'};
 
                     QString addChar;
-                    for(int z=0;z<12;z++) {
-                        addChar+= QString(pwd[rand()%66]);
+                    if(ui->checkBox->isChecked() == true)
+                        addChar = ui->lineEditPasswordManuale->text();
+                    else {
+                        for(int z=0;z<12;z++) {
+                            addChar+= QString(pwd[rand()%66]);
+                        }
                     }
                     QSqlQuery query;
                     QString name_surname;
@@ -165,11 +173,15 @@ void MainWindow::insertAlunni()
                     '0','1','2','3','4','5','6','7','8','9','@','?','!',';'};
 
         QString addChar,name_surname;
-        for(int z=0;z<12;z++) {
-            addChar+= QString(pwd[rand()%66]);
+        if(ui->checkBox->isChecked() == true)
+             addChar = ui->lineEditPasswordManuale->text();
+        else {
+            for(int z=0;z<12;z++) {
+                addChar+= QString(pwd[rand()%66]);
+            }
         }
         name_surname = QString(ui->lineEditNome->text()+"."+ui->lineEditCognome->text()).remove(" ").remove("'").replace("ì","i").replace("à","a").replace("ò","o").toLower()+"@"+ui->lineEditDominio->text().replace("'","''");
-        QString req = "INSERT INTO utenti VALUES('"+ui->lineEditNome->text().replace("'","''")+"','"+ui->lineEditCognome->text().replace("'","''")+"','"+name_surname+"','"+addChar+"','/"+ui->lineEditGruppo->text().replace("'","''")+"')";
+        QString req = "INSERT INTO utenti VALUES('"+ui->lineEditNome->text().replace("'","''")+"','"+ui->lineEditCognome->text().replace("'","''")+"','"+name_surname+"','"+addChar+"','"+ui->lineEditGruppo->text().replace("'","''")+"')";
         query.prepare(req);
         query.exec();
         lista();
